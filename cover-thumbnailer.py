@@ -532,6 +532,10 @@ class Thumb(object):
                freedesktop thumbnail
         """
         if self.thumb is not None:
+            # Ensure the output directory exists
+            output_dir = os.path.dirname(output_path)
+            if output_dir and not os.path.exists(output_dir):
+                os.makedirs(output_dir, exist_ok=True)
             self.thumb.save(output_path, output_format)
         else:
             print("E: [%s:Thumb.save_thumb] No thumbnail created" % __file__)
