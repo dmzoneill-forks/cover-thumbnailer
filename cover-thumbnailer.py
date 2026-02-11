@@ -144,21 +144,20 @@ class Conf(dict):
     def import_gnome_conf(self):
         """ Import user folders from GNOME configuration file. """
         if os.path.isfile(self.user_gnomeconf):
-            gnome_conf_file = open(self.user_gnomeconf, 'r')
-            for line in gnome_conf_file:
-                if re.match(r'.*?XDG_MUSIC_DIR.*?=.*?"(.*)".*?', line) and self['music_usegnomefolder']:
-                    match = re.match(r'.*?XDG_MUSIC_DIR.*?=.*?"(.*)".*?', line)
-                    path = match.group(1).replace('$HOME', self.user_homedir)
-                    #If path == user home dir, don't use it, it's probably a misconfiguration !
-                    if os.path.isdir(path) and not os.path.samefile(path, self.user_homedir):
-                        self['music_paths'].append(path)
-                elif re.match(r'.*?XDG_PICTURES_DIR.*?=.*?"(.*)".*?', line) and self['pictures_usegnomefolder']:
-                    match = re.match(r'.*?XDG_PICTURES_DIR.*?=.*?"(.*)".*?', line)
-                    path = match.group(1).replace('$HOME', self.user_homedir)
-                    #If path == user home dir, don't use it, it's probably a misconfiguration !
-                    if os.path.isdir(path) and not os.path.samefile(path, self.user_homedir):
-                        self['pictures_paths'].append(path)
-            gnome_conf_file.close()
+            with open(self.user_gnomeconf, 'r') as gnome_conf_file:
+                for line in gnome_conf_file:
+                    if re.match(r'.*?XDG_MUSIC_DIR.*?=.*?"(.*)".*?', line) and self['music_usegnomefolder']:
+                        match = re.match(r'.*?XDG_MUSIC_DIR.*?=.*?"(.*)".*?', line)
+                        path = match.group(1).replace('$HOME', self.user_homedir)
+                        #If path == user home dir, don't use it, it's probably a misconfiguration !
+                        if os.path.isdir(path) and not os.path.samefile(path, self.user_homedir):
+                            self['music_paths'].append(path)
+                    elif re.match(r'.*?XDG_PICTURES_DIR.*?=.*?"(.*)".*?', line) and self['pictures_usegnomefolder']:
+                        match = re.match(r'.*?XDG_PICTURES_DIR.*?=.*?"(.*)".*?', line)
+                        path = match.group(1).replace('$HOME', self.user_homedir)
+                        #If path == user home dir, don't use it, it's probably a misconfiguration !
+                        if os.path.isdir(path) and not os.path.samefile(path, self.user_homedir):
+                            self['pictures_paths'].append(path)
         else:
             print("W: [%s:Conf.import_gnome_conf] Can't find `user-dirs.dirs' file." % __file__)
 
@@ -166,39 +165,37 @@ class Conf(dict):
         """ Import user configuration file. """
         if os.path.isfile(self.user_conf):
             current_section = "unknown"
-            user_conf_file = open(self.user_conf, "r")
-            for line in user_conf_file:
-                #Comments
-                if re.match(r"\s*#.*", line):
-                    continue
-                #Section
-                elif re.match(r"\s*\[([a-z]+)\]\s*", line.lower()):
-                    match = re.match(r'\s*\[([a-z]+)\]\s*', line.lower())
-                    current_section = match.group(1)
-                #Boolean key
-                elif re.match(r"\s*([a-z]+)\s*=\s*(yes|no|true|false)\s*", line.lower()):
-                    match = re.match(r"\s*([a-z]+)\s*=\s*(yes|no|true|false)\s*", line.lower())
-                    key = match.group(1)
-                    value = match.group(2)
-                    if value in ("yes", "true"):
-                        value = True
-                    else:
-                        value = False
-                    self[current_section + "_" + key] = value
-                #String key : path
-                elif re.match(r"\s*(path|PATH|Path)\s*=\s*\"(.+)\"\s*", line):
-                    match = re.match(r"\s*(path|PATH|Path)\s*=\s*\"(.+)\"\s*", line)
-                    key = "paths"
-                    value = match.group(2)
-                    self[current_section + "_" + key].append(value)
-                #Integer key
-                elif re.match(r"\s*([a-z]+)\s*=\s*([0-9]+)\s*", line.lower()):
-                    match = re.match(r"\s*([a-z]+)\s*=\s*([0-9]+)\s*", line.lower())
-                    key = match.group(1)
-                    value = match.group(2)
-                    self[current_section + "_" + key] = int(value)
-
-            user_conf_file.close()
+            with open(self.user_conf, "r") as user_conf_file:
+                for line in user_conf_file:
+                    #Comments
+                    if re.match(r"\s*#.*", line):
+                        continue
+                    #Section
+                    elif re.match(r"\s*\[([a-z]+)\]\s*", line.lower()):
+                        match = re.match(r'\s*\[([a-z]+)\]\s*', line.lower())
+                        current_section = match.group(1)
+                    #Boolean key
+                    elif re.match(r"\s*([a-z]+)\s*=\s*(yes|no|true|false)\s*", line.lower()):
+                        match = re.match(r"\s*([a-z]+)\s*=\s*(yes|no|true|false)\s*", line.lower())
+                        key = match.group(1)
+                        value = match.group(2)
+                        if value in ("yes", "true"):
+                            value = True
+                        else:
+                            value = False
+                        self[current_section + "_" + key] = value
+                    #String key : path
+                    elif re.match(r"\s*(path|PATH|Path)\s*=\s*\"(.+)\"\s*", line):
+                        match = re.match(r"\s*(path|PATH|Path)\s*=\s*\"(.+)\"\s*", line)
+                        key = "paths"
+                        value = match.group(2)
+                        self[current_section + "_" + key].append(value)
+                    #Integer key
+                    elif re.match(r"\s*([a-z]+)\s*=\s*([0-9]+)\s*", line.lower()):
+                        match = re.match(r"\s*([a-z]+)\s*=\s*([0-9]+)\s*", line.lower())
+                        key = match.group(1)
+                        value = match.group(2)
+                        self[current_section + "_" + key] = int(value)
 
             #Replace "~/" by the user home dir
             for path_list in (self['music_paths'], self['pictures_paths'], self['ignored_paths']):
