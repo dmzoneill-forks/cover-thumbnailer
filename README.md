@@ -213,7 +213,8 @@ thumbnails should appear after a refresh of the folder.
 
 * **[NEXT]** (changes on `master` but not released yet):
 
-  * Nothing yet ;)
+  * fix: Ensure the output directory exists (@dmzoneill, #23, #25)
+  * fix: Use context manager to prevent potential unclosed file descriptor (@dmzoneill, #27, #28)
 
 * **v0.10.2 (2024-12-14):**
 
